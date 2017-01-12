@@ -1,4 +1,4 @@
-&&/bin/sh
+#!/bin/sh
 
 WORLD_NAME=$1
 WORLD_DIR=/opt/mscs/worlds

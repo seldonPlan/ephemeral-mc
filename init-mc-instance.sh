@@ -312,7 +312,7 @@ parseOpts $*
 setupSystemSoftware
 installMscs
 installEphemeralMc
-runEphemeralMcScript "server-setup.sh" "$WORLD_NAME" "$S3_BUCKET"
+runEphemeralMcScript "server-setup.sh" "$SERVER_NAME" "$S3_BUCKET"
 runEphemeralMcScript "world-setup.sh" "$WORLD_NAME" "$S3_BUCKET"
 installMscsDefaults
 installCrontab
