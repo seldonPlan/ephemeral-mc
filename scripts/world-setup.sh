@@ -25,7 +25,7 @@ mkdir -p $WORK_DIR
 aws s3 sync --exclude "*" --include "$WORLD_NAME-*-latest.tar.gz" $S3_PATH/ $WORK_DIR/
 
 # make sure world files got here OK
-[ ! -f "$WORK_DIR/$WORLD_ARCHIVE" ] || printError "fetching $WORLD_ARCHIVE"
+[ -f "$WORK_DIR/$WORLD_ARCHIVE" ] || printError "fetching $WORLD_ARCHIVE"
 
 # may or may not have mods
 if [ ! -f "$WORK_DIR/$MODS_ARCHIVE" ]; then
