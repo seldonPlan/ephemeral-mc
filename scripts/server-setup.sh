@@ -12,8 +12,8 @@ printError() {
     exit 1
 }
 
-[ -z "$SERVER_NAME" ] || printError "server name required"
-[ -z "$S3_BUCKET" ] || printError "S3 bucket name required"
+[ -z "$SERVER_NAME" ] && printError "server name required"
+[ -z "$S3_BUCKET" ] && printError "S3 bucket name required"
 
 # if this is a first boot run, then server/ and tmp/ may not be created yet
 mkdir -p $SERVER_DIR

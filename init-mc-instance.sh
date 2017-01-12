@@ -177,7 +177,7 @@ runEphemeralMcScript() {
     shift
     [ -f "$RUN_SCRIPT" ] || execFail "$RUN_SCRIPT not found, ephemeral-mc setup"
 
-    $($RUN_SCRIPT ${1="$@"})
+    $RUN_SCRIPT ${1+"$@"}
 }
 
 # create crontab with appropriate args
@@ -257,9 +257,6 @@ parseOpts () {
             --mscs-install-branch )
                 MSCS_BRANCH=$1
                 ;;
-
-                printToMscsDefaults "mscs-enable-mirror" $1
-                ;;
             --mscs-* )
                 case "$OPT" in
                     # special case MIRROR_ENABLED
@@ -301,9 +298,9 @@ parseOpts () {
         shift
     done
 
-    [ -z "$S3_BUCKET" ] || usageFail "--s3-bucket is a required option"
-    [ -z "$WORLD_NAME" ] || usageFail "--world-name is a required option"
-    [ -z "$SERVER_NAME" ] || usageFail "--server-name is a required option"
+    [ -z "$S3_BUCKET" ] && usageFail "--s3-bucket is a required option"
+    [ -z "$WORLD_NAME" ] && usageFail "--world-name is a required option"
+    [ -z "$SERVER_NAME" ] && usageFail "--server-name is a required option"
 }
 
 ################################################################################

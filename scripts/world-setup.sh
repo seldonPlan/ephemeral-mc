@@ -1,4 +1,4 @@
-#!/bin/sh
+&&/bin/sh
 
 WORLD_NAME=$1
 WORLD_DIR=/opt/mscs/worlds
@@ -14,8 +14,8 @@ printError() {
 	exit 1
 }
 
-[ -z "$WORLD_NAME" ] || printError "world name required"
-[ -z "$S3_BUCKET" ] || printError "S3 bucket name required"
+[ -z "$WORLD_NAME" ] && printError "world name required"
+[ -z "$S3_BUCKET" ] && printError "S3 bucket name required"
 
 # if this a first boot run, then worlds and tmp may not be created yet
 mkdir -p $WORLD_DIR

@@ -14,9 +14,9 @@ printError() {
     exit 1
 }
 
-[ -z "$WORLD_NAME" ] || printError "world name required"
-[ -z "$KEEPCOUNT" ] || printError "number of files to keep required"
-[ -z "$KEEPCOUNT" ] || printError "S3 bucket name required"
+[ -z "$WORLD_NAME" ] && printError "world name required"
+[ -z "$KEEPCOUNT" ] && printError "number of files to keep required"
+[ -z "$S3_BUCKET" ] && printError "S3 bucket name required"
 
 # fetch the list of files from s3
 rm -f $WORK_FILE $TEMP_FILE

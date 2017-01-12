@@ -17,9 +17,9 @@ printError() {
     exit 1
 }
 
-[ -z "$WORLD_NAME" ] || printError "world name required"
-[ -z "$S3_BUCKET" ] || printError "S3 bucket name required"
-[ ! -d "$BACKUP_DIR/$WORLD_NAME" ] || printError "source backups not found"
+[ -z "$WORLD_NAME" ] && printError "world name required"
+[ -z "$S3_BUCKET" ] && printError "S3 bucket name required"
+[ ! -d "$BACKUP_DIR/$WORLD_NAME" ] && printError "source backups not found"
 
 rm -rf $WORK_DIR
 mkdir -p $WORK_DIR/$WORLD_NAME
