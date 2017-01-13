@@ -117,7 +117,7 @@ setupSystemSoftware() {
     # apt-get -y upgrade || execFail "upgrade of system packages"
 
     for PKG in $PKGS; do
-        apt-get -y install "$PKG" || execFail "install of $PKG"
+        apt-get -y -qq install "$PKG" || execFail "install of $PKG"
     done
 }
 
@@ -177,7 +177,7 @@ runEphemeralMcScript() {
     shift
     [ -f "$RUN_SCRIPT" ] || execFail "$RUN_SCRIPT not found, ephemeral-mc setup"
 
-    $RUN_SCRIPT ${1+"$@"}
+    $RUN_SCRIPT ${1+"$@"} || execFail "$RUN_SCRIPT unsuccessful, ephemeral-mc setup"
 }
 
 # create crontab with appropriate args
@@ -206,7 +206,7 @@ installCrontab() {
     [ "$MIRROR_ENABLED" -eq "0" ] && echo "$EVERY_FIVE_MIN $SYNC_CMD" >> $MSCS_TMP/crontab
 
     cp "$MSCS_TMP"/crontab "$MSCS_HOME"/scripts/crontab
-    crontab -u "$MSCS_USER" -r
+    crontab -u "$MSCS_USER" -r > /dev/null 2>&1
     crontab -u "$MSCS_USER" "$MSCS_HOME/scripts/crontab"
 }
 
