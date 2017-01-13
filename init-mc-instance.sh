@@ -149,6 +149,10 @@ installMscs() {
     { cd /opt/mscs-src && make install; } || execFail "mscs install"
 }
 
+resetMscsOwnership() {
+    chown -R $MSCS_USER:$MSCS_USER $MSCS_HOME
+}
+
 # install `ephemeral-mc` scripts from git repo
 installEphemeralMc() {
     # must be run after a successful mscs install
@@ -316,3 +320,4 @@ runEphemeralMcScript "server-setup.sh" "$SERVER_NAME" "$S3_BUCKET"
 runEphemeralMcScript "world-setup.sh" "$WORLD_NAME" "$S3_BUCKET"
 installMscsDefaults
 installCrontab
+resetMscsOwnership
