@@ -10,7 +10,7 @@ SCRIPT=$(basename $0)
 # needed software packages
 PKGS_JAVA="openjdk-8-jre-headless"
 PKGS_MSCS_DEPS="perl libjson-perl python make wget rdiff-backup socat iptables"
-PKGS_MISC="git awscli vim htop"
+PKGS_MISC="git awscli vim htop curl"
 
 # script option argument variables
 S3_BUCKET=
@@ -30,6 +30,9 @@ MSCS_USER=minecraft
 EPHMC_REPO=https://github.com/seldonPlan/ephemeral-mc.git
 EPHMC_BRANCH=master
 EPHMC_SRC=/opt/ephmc-src
+
+DUCKDNS_DOMAIN=
+DUCKDNS_TOKEN=
 
 ################################################################################
 ## USAGE & ERROR HANDLING
@@ -82,6 +85,16 @@ Options:
     --archives-to-keep <number-of-archives>
         (OPTIONAL) The number of snapshot archives to keep in S3 for a world
         defaults to 100
+
+    --duckdns-domain <domain-name>
+        (OPTIONAL) subdomain name used for the duckdns service
+        specify this option along with '--duckdns-token' to update the duckdns
+        domain with the public ip from this instance
+
+    --duckdns-token <token>
+        (OPTIONAL) token string used for the duckdns service
+        specify this option along with '--duckdns-domain' to update the duckdns
+        domain with the public ip from this instance
 
 EOF
 }
@@ -293,6 +306,12 @@ parseOpts () {
                 [ "$1" -eq "$1" ] 2>/dev/null || usageFail "--archives-to-keep must be a number"
                 ARCHIVES_TO_KEEP=$1
                 ;;
+            --duckdns-domain )
+                DUCKDNS_DOMAIN=$1
+                ;;
+            --duckdns-token )
+                DUCKDNS_TOKEN=$1
+                ;;
             * )
                 usageFail "unknown option [$OPT]"
                 ;;
@@ -302,9 +321,12 @@ parseOpts () {
         shift
     done
 
+    # required field validation
     [ -z "$S3_BUCKET" ] && usageFail "--s3-bucket is a required option"
     [ -z "$WORLD_NAME" ] && usageFail "--world-name is a required option"
     [ -z "$SERVER_NAME" ] && usageFail "--server-name is a required option"
+    [ ! -z "$DUCKDNS_DOMAIN" ] && [ -z "$DUCKDNS_TOKEN" ] && "--duckdns-token is required when --duckdns-domain is specified"
+    [ -z "$DUCKDNS_DOMAIN" ] && [ ! -z "$DUCKDNS_TOKEN" ] && "--duckdns-domain is required when --duckdns-token is specified"
 }
 
 ################################################################################
@@ -321,3 +343,4 @@ runEphemeralMcScript "world-setup.sh" "$WORLD_NAME" "$S3_BUCKET"
 installMscsDefaults
 installCrontab
 resetMscsOwnership
+runEphemeralMcScript "duckdns_update.sh" "$DUCKDNS_DOMAIN" "$DUCKDNS_TOKEN"

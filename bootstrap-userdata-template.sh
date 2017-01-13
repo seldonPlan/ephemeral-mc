@@ -13,4 +13,6 @@ chmod 744 /opt/ephemeral-mc/init-mc-instance.sh
     --mscs-default-initial-memory {{MIN_MEM_IN_M}} \
     --mscs-default-maximum-memory {{MAX_MEM_IN_M}} \
     --mscs-log-duration 3 \
-    --mscs-backup-duration 1
+    --mscs-backup-duration 1 \
+    --duckdns-domain {{DUCKDNS_DOMAIN_NAME}} \
+    --duckdns-token {{DUCKDNS_TOKEN_STRING}}
