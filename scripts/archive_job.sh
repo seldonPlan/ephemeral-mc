@@ -28,6 +28,8 @@ rdiff-backup \
 	-r now \
 	--exclude **/mods \
 	--exclude **/config \
+    --exclude **/scripts \
+    --exclude **/resources \
 	"$BACKUP_DIR/$WORLD_NAME" "$WORK_DIR/$WORLD_NAME" || printError "copying backup"
 
 tar \
