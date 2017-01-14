@@ -3,7 +3,7 @@
 WORLD_NAME=$1
 S3_BUCKET=$2
 S3_PATH=s3://$S3_BUCKET/worlds
-WORK_DIR=/opt/mscs/tmp/archived_backups
+WORK_DIR=/tmp/mscs/archived_backups
 BACKUP_DIR=/opt/mscs/backups
 BACKUP_ARCHIVE_NAME=$WORLD_NAME-world-$FILEDATE.tar.gz
 LATEST_ARCHIVE_NAME=$WORLD_NAME-world-latest.tar.gz
