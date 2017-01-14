@@ -26,6 +26,7 @@ MSCS_SRC=/opt/mscs-src
 MSCS_TMP=/tmp/mscs
 MSCS_TMP_DEFAULTS=$MSCS_TMP/mscs.defaults
 MSCS_USER=minecraft
+MSCS_START_SERVER=1
 
 EPHMC_REPO=https://github.com/seldonPlan/ephemeral-mc.git
 EPHMC_BRANCH=master
@@ -96,6 +97,9 @@ Options:
         specify this option along with '--duckdns-domain' to update the duckdns
         domain with the public ip from this instance
 
+    --start-server
+        (OPTIONAL) the presence of this option will issue an mscs start command
+
 EOF
 }
 
@@ -164,6 +168,7 @@ installMscs() {
 
 resetMscsOwnership() {
     chown -R $MSCS_USER:$MSCS_USER $MSCS_HOME
+    [ -d "$MSCS_TMP" ] && chown -R $MSCS_USER:$MSCS_USER $MSCS_TMP
 }
 
 # install `ephemeral-mc` scripts from git repo
@@ -241,79 +246,82 @@ isOpt() {
     return 1
 }
 
-
-# Option parsing has been dumbed down to make it easier to process,
-# the following should be true of every option:
-#   - is long-form (ex. "--foo", as opposed to short-form "-f")
-#   - has at least one argument (boolean opts too: true|false, yes|no, etc...)
 parseOpts () {
     local OPT MSCS_DEF_OPT
     while [ ! -z "$1" ]; do
         OPT=$1
 
-        # arguments are required for all options
-        if $(isOpt $2); then
-            usageFail "missing argument for [$OPT]"
-        fi
-
-        # process argument(s) to $OPT
-        shift
-        case "$OPT" in
-            --s3-bucket )
-                S3_BUCKET=$1
+        case "$1" in
+            # options without arguments
+            --start-server )
+                MSCS_START_SERVER=0
                 ;;
-            --world-name )
-                WORLD_NAME=$1
-                ;;
-            --server-name )
-                SERVER_NAME=$1
-                ;;
-            --mscs-install-repo )
-                MSCS_REPO=$1
-                ;;
-            --mscs-install-branch )
-                MSCS_BRANCH=$1
-                ;;
-            --mscs-* )
+            # options with arguments
+            * )
+                # arguments are required for all options
+                if $(isOpt $2); then
+                    usageFail "missing argument for [$OPT]"
+                fi
+                # process argument(s) to $OPT
+                shift
                 case "$OPT" in
-                    # special case MIRROR_ENABLED
-                    --mscs-enable-mirror )
-                        if [ "$1" -eq 0 ]; then
-                            # in mscs.defaults, [0] indicates mirror DISABLED
-                            MIRROR_ENABLED=1
-                        elif [ "$1" -eq 1 ]; then
-                            # in mscs.defaults, [1] indicates mirror ENABLED
-                            MIRROR_ENABLED=0
-                        else
-                            usageFail "--mscs-enable-mirror 1 or 0"
-                        fi
+                    --s3-bucket )
+                        S3_BUCKET=$1
+                        ;;
+                    --world-name )
+                        WORLD_NAME=$1
+                        ;;
+                    --server-name )
+                        SERVER_NAME=$1
+                        ;;
+                    --mscs-install-repo )
+                        MSCS_REPO=$1
+                        ;;
+                    --mscs-install-branch )
+                        MSCS_BRANCH=$1
+                        ;;
+                    --mscs-* )
+                        case "$OPT" in
+                            # special case MIRROR_ENABLED
+                            --mscs-enable-mirror )
+                                if [ "$1" -eq 0 ]; then
+                                    # in mscs.defaults, [0] indicates mirror DISABLED
+                                    MIRROR_ENABLED=1
+                                elif [ "$1" -eq 1 ]; then
+                                    # in mscs.defaults, [1] indicates mirror ENABLED
+                                    MIRROR_ENABLED=0
+                                else
+                                    usageFail "--mscs-enable-mirror 1 or 0"
+                                fi
+                                ;;
+                            * )
+                                :
+                                ;;
+                        esac
+
+                        printToMscsDefaults $(echo $OPT | awk -F "--" '{print $2}') $1
+                        ;;
+                    --ephmc-install-repo )
+                        EPHMC_REPO=$1
+                        ;;
+                    --ephmc-install-branch )
+                        EPHMC_BRANCH=$1
+                        ;;
+                    --archives-to-keep )
+                        # tautology uses undocumented behavior fails when $1 is not an integer
+                        [ "$1" -eq "$1" ] 2>/dev/null || usageFail "--archives-to-keep must be a number"
+                        ARCHIVES_TO_KEEP=$1
+                        ;;
+                    --duckdns-domain )
+                        DUCKDNS_DOMAIN=$1
+                        ;;
+                    --duckdns-token )
+                        DUCKDNS_TOKEN=$1
                         ;;
                     * )
-                        :
+                        usageFail "unknown option [$OPT]"
                         ;;
                 esac
-
-                printToMscsDefaults $(echo $OPT | awk -F "--" '{print $2}') $1
-                ;;
-            --ephmc-install-repo )
-                EPHMC_REPO=$1
-                ;;
-            --ephmc-install-branch )
-                EPHMC_BRANCH=$1
-                ;;
-            --archives-to-keep )
-                # tautology uses undocumented behavior fails when $1 is not an integer
-                [ "$1" -eq "$1" ] 2>/dev/null || usageFail "--archives-to-keep must be a number"
-                ARCHIVES_TO_KEEP=$1
-                ;;
-            --duckdns-domain )
-                DUCKDNS_DOMAIN=$1
-                ;;
-            --duckdns-token )
-                DUCKDNS_TOKEN=$1
-                ;;
-            * )
-                usageFail "unknown option [$OPT]"
                 ;;
         esac
 
@@ -344,3 +352,4 @@ installMscsDefaults
 installCrontab
 resetMscsOwnership
 runEphemeralMcScript "duckdns_update.sh" "$DUCKDNS_DOMAIN" "$DUCKDNS_TOKEN"
+[ "$MSCS_START_SERVER" -eq 0 ] && mscs start "$WORLD_NAME"
