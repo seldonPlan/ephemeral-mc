@@ -333,8 +333,8 @@ parseOpts () {
     [ -z "$S3_BUCKET" ] && usageFail "--s3-bucket is a required option"
     [ -z "$WORLD_NAME" ] && usageFail "--world-name is a required option"
     [ -z "$SERVER_NAME" ] && usageFail "--server-name is a required option"
-    [ ! -z "$DUCKDNS_DOMAIN" ] && [ -z "$DUCKDNS_TOKEN" ] && "--duckdns-token is required when --duckdns-domain is specified"
-    [ -z "$DUCKDNS_DOMAIN" ] && [ ! -z "$DUCKDNS_TOKEN" ] && "--duckdns-domain is required when --duckdns-token is specified"
+    [ ! -z "$DUCKDNS_DOMAIN" ] && [ -z "$DUCKDNS_TOKEN" ] && usageFail "--duckdns-token is required when --duckdns-domain is specified"
+    [ -z "$DUCKDNS_DOMAIN" ] && [ ! -z "$DUCKDNS_TOKEN" ] && usageFail "--duckdns-domain is required when --duckdns-token is specified"
 }
 
 ################################################################################
