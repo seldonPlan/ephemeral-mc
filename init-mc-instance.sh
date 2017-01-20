@@ -214,9 +214,9 @@ installCrontab() {
     EVERY_OTHER_HOUR='1 */2 * * *'
     EVERY_THIRTY_MINUTES='0,30 * * * *'
 
-    BACKUP_CMD="[ -z \"\$(mscs ls running | grep $WORLD_NAME)\" ] && mscs backup $WORLD_NAME && $MSCS_HOME/scripts/archive_job.sh $WORLD_NAME $S3_BUCKET"
-    SYNC_CMD="[ -z \"\$(mscs ls running | grep $WORLD_NAME)\" ] && mscs sync $WORLD_NAME"
-    ARCHIVE_ROTATE_CMD="[ -z \"\$(mscs ls running | grep $WORLD_NAME)\" ] && $MSCS_HOME/scripts/s3_archive_rotation_job.sh $WORLD_NAME $ARCHIVES_TO_KEEP $S3_BUCKET"
+    BACKUP_CMD="[ ! -z \"\$(mscs ls running | grep $WORLD_NAME)\" ] && mscs backup $WORLD_NAME && $MSCS_HOME/scripts/archive_job.sh $WORLD_NAME $S3_BUCKET"
+    SYNC_CMD="[ ! -z \"\$(mscs ls running | grep $WORLD_NAME)\" ] && mscs sync $WORLD_NAME"
+    ARCHIVE_ROTATE_CMD="[ ! -z \"\$(mscs ls running | grep $WORLD_NAME)\" ] && $MSCS_HOME/scripts/s3_archive_rotation_job.sh $WORLD_NAME $ARCHIVES_TO_KEEP $S3_BUCKET"
 
     rm -f $MSCS_TMP/crontab
 
